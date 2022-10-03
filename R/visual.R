@@ -11,7 +11,7 @@ dist_plot <- function(parameter) {
     left_join(total_count, by = "macroarea") %>% 
     mutate(
       across(
-        "value_description", 
+        "value_description",
         factor, ordered = TRUE, levels = level_list[[parameter]]
         ),
       percent = n / total
@@ -20,7 +20,10 @@ dist_plot <- function(parameter) {
       x = ~ macroarea, y = ~ percent,
       color = ~ value_description,
       type = "bar"
-      )
+      ) %>% 
+    layout(
+      title = filter(data_list$parameters, id == parameter)$parameter_name
+    )
 }
 
 level_list <- list(

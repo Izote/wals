@@ -41,10 +41,6 @@ wals <- data_list$values %>%
     by = c("code_id" = "id")
     ) %>% 
   left_join(
-    select(data_list$parameters, name_list$parameters[column_list$parameters]),
-    by = c("parameter_id" = "id")
-    ) %>% 
-  left_join(
     select(data_list$languages, name_list$languages[column_list$languages]),
     by = c("language_id" = "id")
     ) %>% 
