@@ -1,31 +1,25 @@
 library(plotly)
 
-dist_plot <- function(parameter) {
-  total_count <- filter(wals, parameter_id == parameter) %>% 
+dist_plot <- function(pid) {
+  param <- get_parameter(pid)
+  
+  # TODO
+  # This should be packed as output from get_parameter.
+  value_levels <- arrange(param$codes, desc(value_order))$value_label
+  
+  total_count <- param$values %>% 
     count(macroarea, name = "total")
   
-  wals %>% 
-    filter(parameter_id == parameter) %>% 
-    group_by(macroarea, value_description) %>% 
-    summarize(n = n(), .groups = "drop") %>%
-    left_join(total_count, by = "macroarea") %>% 
-    mutate(
-      across(
-        "value_description",
-        factor, ordered = TRUE, levels = level_list[[parameter]]
-        ),
-      percent = n / total
-      ) %>% 
+  # TODO
+  # `count_values` should just have the `param` list passed to it instead
+  # of the first two arguments. This assumes prior TODO was accomplished.
+  count_values(param$values, value_levels, "macroarea") %>% 
     plot_ly(
       x = ~ macroarea, y = ~ percent,
-      color = ~ value_description,
+      color = ~ value_label,
       type = "bar"
       ) %>% 
     layout(
-      title = filter(data_list$parameters, id == parameter)$parameter_name
+      title = param$name
     )
 }
-
-level_list <- list(
-  "2A" = c("Large (7-14)", "Average (5-6)", "Small (2-4)")
-)
