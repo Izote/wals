@@ -1,14 +1,14 @@
 get_parameter <- function(pid) {
   list(
-    name = filter(parameters, id == pid)$parameter_name,
-    codes = filter(codes, name == pid),
+    name = filter(parameters, id == pid)$parameter,
+    codes = filter(codes, parameter_id == pid),
     values = filter(values, parameter_id == pid) 
   )
 }
 
 count_values <- function(pid_df, pid_levels, grp_vars, as_pct = TRUE) {
   if (!"value_label" %in% grp_vars) {
-    grp_vars <- c(grp_vars, "value_label")
+    grp_vars <- c(grp_vars, "label")
   }
   
   df <- pid_df %>% 
@@ -16,7 +16,7 @@ count_values <- function(pid_df, pid_levels, grp_vars, as_pct = TRUE) {
     summarize(n = n(), .groups = "drop")
   
   if (as_pct) {
-    total_vars <- grp_vars[grp_vars != "value_label"]
+    total_vars <- grp_vars[grp_vars != "label"]
     totals <- pid_df %>% 
       count(across(all_of(total_vars)), name = "total_n")
     
@@ -27,5 +27,5 @@ count_values <- function(pid_df, pid_levels, grp_vars, as_pct = TRUE) {
   }
   
   df %>% 
-    mutate(across("value_label", factor, ordered = TRUE, levels = pid_levels))
+    mutate(across("label", factor, ordered = TRUE, levels = pid_levels))
 }

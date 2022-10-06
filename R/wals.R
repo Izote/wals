@@ -5,47 +5,47 @@ read_wals <- function(table) {
   file_path <- sprintf("./cldf/%s.csv", table)
   read_csv(
     file_path,
-    col_names = column_names[[table]],
-    col_types = column_types[[table]],
-    skip = 1
+    col_types = column_types[[table]]
   )
 }
 
-# Leave this to make building visualizations consistent, but ultimately
-# a simple set of renames can more readably handle this need downstream.
-column_names <- list(
-  codes = c("id", "name", "value_label", "chapter_id", "value_order", "icon"),
-  languages = c("id", "language_name", "macroarea", "latitude", "longitude", 
-                "glotto_code", "iso_639P3_code", "family", "subfamily", "genus",
-                "genus_icon", "iso_codes", "samples_100", "samples_200", 
-                "country_id", "source"),
-  parameters = c("id", "parameter_name", "parameter_description", "chapter_id"),
-  values = c("id", "language_id", "parameter_id", "value", "code_id", "comment",
-             "source", "example_id")
-)
+names_to_lower <- function(df) {
+  str_to_lower(colnames(df))
+}
+
+n_cols <- list(codes = 6, languages = 16, parameters = 4, values = 8)
 
 join_columns <- list(
   codes = c(1, 3, 5),
-  languages = c(1, 2, 3, 4, 5, 8, 9, 10),
+  languages = c(1, language = 2, 3, 4, 5, 8, 9, 10),
   parameters = c(1, 2)
 )
 
-column_types <- map(column_names, ~ paste0(rep("c", length(.x)), collapse = ""))
+column_types <- map(n_cols, ~ paste0(rep("c", .x, collapse = "")))
 
-data_list <- map(names(column_names), read_wals) %>% 
-  setNames(names(column_names))
+data_list <- map(names(n_cols), read_wals) %>%
+  setNames(names(n_cols))
 
-codes <- data_list$codes
-parameters <- data_list$parameters
+codes <- data_list$codes %>% 
+  rename("label" = "Name", "order" = "Number")
+
+parameters <- data_list$parameters %>% 
+  rename("parameter" = "Name")
+
 values <- data_list$values %>% 
   left_join(
-    select(data_list$codes, column_names$codes[join_columns$codes]),
-    by = c("code_id" = "id")
+    select(data_list$codes, join_columns$codes),
+    by = c("Code_ID" = "ID")
     ) %>% 
   left_join(
-    select(data_list$languages, column_names$languages[join_columns$languages]),
-    by = c("language_id" = "id")
+    select(data_list$languages, join_columns$languages),
+    by = c("Language_ID" = "ID")
     ) %>% 
-  select(-id, -language_id, -code_id, -example_id, -comment, -source)
+  rename("label" = "Name") %>% 
+  select(-ID, -Language_ID, -Code_ID, -Comment, -Source)
 
-rm(column_names, join_columns, column_types)
+colnames(codes) <- names_to_lower(codes)
+colnames(parameters) <- names_to_lower(parameters)
+colnames(values) <- names_to_lower(values)
+
+rm(n_cols, join_columns, column_types, data_list)
