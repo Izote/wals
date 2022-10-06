@@ -5,7 +5,7 @@ dist_plot <- function(pid) {
   
   # TODO
   # This should be packed as output from get_parameter.
-  value_levels <- arrange(param$codes, desc(value_order))$value_label
+  value_levels <- arrange(param$codes, desc(order))$label
   
   total_count <- param$values %>% 
     count(macroarea, name = "total")
@@ -16,7 +16,7 @@ dist_plot <- function(pid) {
   count_values(param$values, value_levels, "macroarea") %>% 
     plot_ly(
       x = ~ macroarea, y = ~ percent,
-      color = ~ value_label,
+      color = ~ label,
       type = "bar"
       ) %>% 
     layout(
