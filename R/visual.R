@@ -15,16 +15,29 @@ macro_plot <- function(pid, plot_type = "bar") {
     )
 }
 
-family_plot <- function(pid, macro) {
-  param <- get_parameter(pid)
-  
-  param %>% 
-    count_values(c("macroarea", "family")) %>%
-    drop_na() %>%
-    filter(macroarea == macro) %>% 
+family_plot <- function(df) {
+  df %>% 
+    drop_na() %>% 
     plot_ly(
-      y = ~ family, x = ~ label, 
-      text = ~ scales::percent_format(1)(percent), 
-      type = "scatter", mode = "text"
-      )
+      x = ~ family, y = ~ label, z = ~ percent,
+      type = "heatmap", colors = "Greys",
+      showscale = FALSE
+    ) %>% 
+    layout(
+      xaxis = list(tickangle = -45)
+    )
 }
+
+family_plots <- function(pid) {
+  values <- get_parameter(pid) %>% 
+    count_values(c("macroarea", "family")) %>% 
+    group_by(macroarea) %>% 
+    do(fig = family_plot(.))
+  
+  fig <- values %>% 
+    subplot(shareY = TRUE, nrows = 1)
+  
+  fig
+}
+
+
