@@ -9,8 +9,8 @@ server <- function(input, output) {
     macro_plot(input$param)
     })
   
-  output$family_plot <- renderPlotly({
-    family_plot(input$param, input$macro)
+  output$family_plots <- renderPlotly({
+    family_plots(input$param)
     })
 }
 
@@ -19,18 +19,13 @@ ui <- fluidPage(
   fluidRow(
     textOutput("title", container = h2), # manage size with CSS
     column(
-      width = 4,
+      width = 12,
       selectInput("param", "Parameter", param_choices),
       ),
-    column(
-      width = 4, 
-      selectInput("macro", "Macroarea", macro_choices)
-      ),
-    column(width = 4),
     ),
   hr(),
   plotlyOutput("macro_plot"),
-  plotlyOutput("family_plot"),
+  plotlyOutput("family_plots"),
   )
 
 shinyApp(ui = ui, server = server)
