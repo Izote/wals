@@ -1,23 +1,36 @@
 library(shiny)
 
 server <- function(input, output) {
-  output$dist_plot <- renderPlotly({dist_plot(input$pid_selection)})
+  output$title <- renderText({
+    sprintf("Now viewing: %s", get_parameter(input$param)$name)
+    })
+  
+  output$macro_plot <- renderPlotly({
+    macro_plot(input$param)
+    })
+  
+  output$family_plot <- renderPlotly({
+    family_plot(input$param, input$macro)
+    })
 }
 
 ui <- fluidPage(
   title = "Browser Title",
   fluidRow(
+    textOutput("title", container = h2), # manage size with CSS
     column(
       width = 4,
-      h1("Visual Title"),
-      selectInput("pid_selection", "Label", parameters$id)
+      selectInput("param", "Parameter", param_choices),
       ),
-    # Placeholder columns, assuming additional controls.
-    column(width = 4),
+    column(
+      width = 4, 
+      selectInput("macro", "Macroarea", macro_choices)
+      ),
     column(width = 4),
     ),
   hr(),
-  plotlyOutput("dist_plot")
+  plotlyOutput("macro_plot"),
+  plotlyOutput("family_plot"),
   )
 
 shinyApp(ui = ui, server = server)

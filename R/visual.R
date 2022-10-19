@@ -1,25 +1,30 @@
 library(plotly)
 
-dist_plot <- function(pid) {
+macro_plot <- function(pid, plot_type = "bar") {
   param <- get_parameter(pid)
   
-  # TODO
-  # This should be packed as output from get_parameter.
-  value_levels <- arrange(param$codes, desc(order))$label
-  
-  total_count <- param$values %>% 
-    count(macroarea, name = "total")
-  
-  # TODO
-  # `count_values` should just have the `param` list passed to it instead
-  # of the first two arguments. This assumes prior TODO was accomplished.
-  count_values(param$values, value_levels, "macroarea") %>% 
+  param %>% 
+    count_values("macroarea") %>% 
     plot_ly(
       x = ~ macroarea, y = ~ percent,
       color = ~ label,
-      type = "bar"
+      type = plot_type
       ) %>% 
     layout(
       title = param$name
     )
+}
+
+family_plot <- function(pid, macro) {
+  param <- get_parameter(pid)
+  
+  param %>% 
+    count_values(c("macroarea", "family")) %>%
+    drop_na() %>%
+    filter(macroarea == macro) %>% 
+    plot_ly(
+      y = ~ family, x = ~ label, 
+      text = ~ scales::percent_format(1)(percent), 
+      type = "scatter", mode = "text"
+      )
 }

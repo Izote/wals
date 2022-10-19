@@ -1,7 +1,7 @@
 library(tidyverse)
 
 read_wals <- function(table) {
-  # temporary (local) directory while development is still highly active
+  # temporary (local) directory while development is still active
   file_path <- sprintf("./cldf/%s.csv", table)
   read_csv(
     file_path,
@@ -47,5 +47,12 @@ values <- data_list$values %>%
 colnames(codes) <- names_to_lower(codes)
 colnames(parameters) <- names_to_lower(parameters)
 colnames(values) <- names_to_lower(values)
+
+param_choices <- parameters$id
+names(param_choices) <- sprintf("%s: %s", parameters$id, parameters$parameter)
+
+# Temporary vector
+macro_choices <- c("Africa", "Australia", "Eurasia", "North America", 
+                   "Papunesia", "South America")
 
 rm(n_cols, join_columns, column_types, data_list)
