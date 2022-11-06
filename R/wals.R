@@ -1,8 +1,11 @@
 library(tidyverse)
 
 read_wals <- function(table) {
-  # temporary (local) directory while development is still active
-  file_path <- sprintf("./cldf/%s.csv", table)
+  file_path <- sprintf(
+    "https://raw.githubusercontent.com/cldf-datasets/wals/master/cldf/%s.csv",
+    table
+    )
+
   read_csv(
     file_path,
     col_types = column_types[[table]]
