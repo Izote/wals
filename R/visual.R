@@ -10,9 +10,9 @@ bar_plot <- function(pid, plot_type = "bar") {
       color = ~ label,
       type = plot_type
       ) %>%
-    add_trace(
-      hovertemplate = "%{x}: %{y:.0%}<extra></extra>"
-      ) %>% 
+    # add_trace(
+    #   hovertemplate = "%{x}: %{y:.0%}<extra></extra>"
+    #   ) %>% 
     layout(
       plot_bgcolor="#CCCCCC",
       title = "Parameter distribution by linguistic macroarea",
